@@ -1,16 +1,27 @@
 const express = require('express');
-const app = express();
 
+const app = express();
 const server = require('http').Server(app);
 
-// Socket.io
 const io = require('socket.io')(server);
 
-io.on('connection', (socket) => {
-  require('./sockets/chat.js')(io, socket);
+let onlineUsers = {};
+
+let channels = {
+  "General": []
+};
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+
+  require('./sockets/chat.js')(
+    io,
+    socket,
+    onlineUsers,
+    channels
+  );
 });
 
-// Express View Engine for Handlebars
 const exphbs = require('express-handlebars');
 
 app.engine('handlebars', exphbs.engine({
@@ -19,7 +30,6 @@ app.engine('handlebars', exphbs.engine({
 
 app.set('view engine', 'handlebars');
 
-// Public folder
 app.use('/public', express.static('public'));
 
 app.get('/', (req, res) => {
