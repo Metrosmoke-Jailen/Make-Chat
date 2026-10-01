@@ -10,11 +10,16 @@ io.on('connection', (socket) => {
   require('./sockets/chat.js')(io, socket);
 });
 
+// Express View Engine for Handlebars
 const exphbs = require('express-handlebars');
 
-app.engine('handlebars', exphbs.engine());
+app.engine('handlebars', exphbs.engine({
+  defaultLayout: false
+}));
+
 app.set('view engine', 'handlebars');
 
+// Public folder
 app.use('/public', express.static('public'));
 
 app.get('/', (req, res) => {
